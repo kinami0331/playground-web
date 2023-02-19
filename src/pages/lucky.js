@@ -3,28 +3,170 @@ import styles from "@/styles/Home.module.scss";
 import {TitleHeader} from "@/components/TitleHeader";
 import {useRouter} from "next/router";
 import {LeftCircleIcon} from "@/components/SvgIcons";
+import {Button, Form, InputNumber, Switch} from "antd";
+import {ContentWrapper} from "@/components/ContentWrapper";
+import {useState} from "react";
+import dynamic from "next/dynamic";
+
+const Line = dynamic(() => import("@ant-design/plots").then((mod) => mod.Line), {ssr: false});
+
 
 export default function Lucky() {
+    let [curP, setCurP] = useState(0.5);
+    let [curCount, setCurCount] = useState(0);
+    let [notList, setNotList] = useState([1]);
+    let [useNot, setUseNot] = useState(false);
+    let [form] = Form.useForm();
+
     const router = useRouter();
+
+    const calcList = (p, maxNum) => {
+        let t_p = p / 100;
+        console.log(t_p);
+        console.log(maxNum);
+
+        if (Math.abs(t_p - curP) < 1e-8) {
+            let t_not_list = notList;
+            if (curCount < maxNum) {
+                for (let i = curCount + 1; i <= maxNum; i++) {
+                    t_not_list.push(t_not_list[t_not_list.length - 1] * (1 - t_p));
+                }
+                setNotList(t_not_list);
+                setCurCount(maxNum);
+            } else {
+                setNotList(t_not_list.slice(0, maxNum + 1));
+                setCurCount(maxNum);
+            }
+        } else {
+            setCurP(t_p);
+            let t_not_list = [1];
+            for (let i = 1; i <= maxNum; i++) {
+                t_not_list.push(t_not_list[t_not_list.length - 1] * (1 - t_p));
+            }
+            setNotList(t_not_list);
+            setCurCount(maxNum);
+        }
+    };
+
+    return (<>
+        <Head>
+            <title>抽卡概率计算器</title>
+            <meta name="description" content="抽卡概率计算器"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1"/>
+            <link rel="icon" href="/favicon.ico"/>
+        </Head>
+
+        <main className={styles.main}>
+            <TitleHeader
+                title="抽卡概率计算器"
+                icon={<LeftCircleIcon/>}
+                onClick={() => {
+                    router.push("/").then();
+                }}
+            />
+
+            <ContentWrapper>
+                <Form name="setting" autoComplete="off"
+                      form={form}
+                      initialValues={{
+                          p: 0.5,
+                          maxNum: 100
+                      }}
+                      style={{width: "100%"}}
+                      wrapperCol={{
+                          span: 12
+                      }}
+                      onValuesChange={(_, values) => {
+                          // console.log(changedValues);
+                          if (values.maxNum !== undefined) {
+                              if (values.maxNum === null)
+                                  values.maxNum = 100;
+                              else if (values.maxNum < 1)
+                                  values.maxNum = 1;
+                              else if (values.maxNum > 10000)
+                                  values.maxNum = 10000;
+                              values.maxNum = Math.floor(values.maxNum);
+                          }
+                          if (values.p !== undefined) {
+                              if (values.p === null)
+                                  values.p = 0.1;
+                              else if (values.p < 0)
+                                  values.p = 0;
+                              else if (values.p > 100)
+                                  values.p = 100;
+                          }
+                          form.setFieldsValue(values);
+                          setUseNot(values.useNot);
+                      }}
+                      onFinish={(values) => {
+                          calcList(values.p, values.maxNum);
+                      }}
+                >
+                    <Form.Item label="单次概率" name="p" rules={[
+                        {min: 0, type: "number", message: "概率不能小于 0%"},
+                        {max: 100, type: "number", message: "概率不能大于 100%"}
+                    ]}>
+                        <InputNumber step={0.5} addonAfter="%" style={{width: "100%"}}/>
+                    </Form.Item>
+                    <Form.Item label="最大次数" name="maxNum" rules={[
+                        {min: 1, type: "integer", message: "最大次数应当是一个正整数"}
+                    ]}>
+                        <InputNumber step={10} style={{width: "100%"}}/>
+                    </Form.Item>
+                    <Form.Item label="显示抽不到的概率" name="useNot" valuePropName="checked">
+                        <Switch/>
+                    </Form.Item>
+                    <Form.Item>
+                        <Button size="middle" htmlType="submit">
+                            计算！
+                        </Button>
+                    </Form.Item>
+
+                </Form>
+            </ContentWrapper>
+            <br/>
+
+            <ProbabilityPlot notList={notList} useNot={useNot}/>
+
+        </main>
+    </>);
+}
+
+function ProbabilityPlot({notList, useNot}) {
+    const data = notList.map((item, index) => ({count: index, probability: useNot ? item * 100 : 100 * (1 - item)}));
+    const lastNotData = notList[notList.length - 1] * 100;
+    const config = {
+        data,
+        padding: "auto",
+        xField: "count",
+        yField: "probability",
+        xAxis: {
+            tickInterval: 10,
+            title: {
+                text: "次数"
+            }
+        },
+        yAxis: {
+            min: useNot ? lastNotData : 100 - notList[0] * 100,
+            title: {
+                text: "%",
+                autoRotate: false,
+                position: "end"
+            }
+        },
+        tooltip: {
+            formatter: (datum) => {
+                return {name: "概率", value: datum.probability.toPrecision(4) + "%"};
+            }
+        },
+        smooth: true
+    };
     return (
         <>
-            <Head>
-                <title>抽卡概率计算</title>
-                <meta name="description" content="抽卡概率计算器"/>
-                <meta name="viewport" content="width=device-width, initial-scale=1"/>
-                <link rel="icon" href="/favicon.ico"/>
-            </Head>
-
-            <main className={styles.main}>
-                <TitleHeader
-                    title="抽卡概率计算器"
-                    icon={<LeftCircleIcon/>}
-                    onClick={() => {
-                        router.push("/").then();
-                    }}
-                />
-
-            </main>
+            <h3 style={{marginBottom: "12px", fontWeight: "400"}}>
+                {useNot ? "抽不到的概率" : "能抽到的概率"}
+            </h3>
+            <Line {...config} style={{width: "100%"}}/>
         </>
     );
 }
