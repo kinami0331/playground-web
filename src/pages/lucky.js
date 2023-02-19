@@ -71,8 +71,6 @@ export default function Lucky() {
         <Head>
             <title>抽卡概率计算器</title>
             <meta name="description" content="抽卡概率计算器"/>
-            <meta name="viewport" content="width=device-width, initial-scale=1"/>
-            <link rel="icon" href="/favicon.ico"/>
         </Head>
 
         <main className={styles.main}>
