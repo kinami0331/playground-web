@@ -22,7 +22,8 @@ export default function Lucky() {
 
     const initialValues = useMemo(() => ({
         p: 0.5,
-        pGot: 1838,
+        pLimit: 99,
+        pGot: 919,
         maxNum: 100
     }), []);
 
@@ -112,8 +113,19 @@ export default function Lucky() {
                                   values.p = 0;
                               else if (values.p > 100)
                                   values.p = 100;
-                              values.pGot = Math.abs(Math.ceil(Math.log(0.0001) / Math.log((1 - values.p / 100))));
                           }
+                          if (values.pLimit !== undefined) {
+                              if (values.pLimit === null)
+                                  values.pLimit = 0;
+                              else if (values.pLimit < 0)
+                                  values.pLimit = 0;
+                              else if (values.pLimit > 100)
+                                  values.pLimit = 99;
+                          }
+
+                          values.pGot = Math.abs(Math.ceil(
+                              Math.log(1 - values.pLimit / 100) / Math.log((1 - values.p / 100))
+                          ));
                           form.setFieldsValue(values);
                           setUseNot(values.useNot);
                           calcList(values);
@@ -129,8 +141,13 @@ export default function Lucky() {
                         <InputNumber step={0.5} addonAfter="%" style={{width: "100%"}}/>
                     </Form.Item>
 
+                    <Form.Item label="出货阈值" name="pLimit"
+                               extra={"你觉得多大的概率下能保证一定出货"}>
+                        <InputNumber addonAfter="%" style={{width: "100%"}}/>
+                    </Form.Item>
+
                     <Form.Item label="出货所需次数" name="pGot"
-                               extra={"计算的是出货率 99.99% 的次数"}>
+                               extra={"出货概率达到出货阈值所需的次数"}>
                         <InputNumber disabled={true} style={{width: "100%"}}/>
                     </Form.Item>
 
