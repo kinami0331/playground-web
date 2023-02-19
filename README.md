@@ -7,7 +7,7 @@
 ```bash
 git clone git@github.com:kinami0331/toolbox-web.git
 cd toolbox-web
-npm install && npm build && npm start
+npm install && npm run build && npm run start
 ```
 
-静态部署使用 `npm build_static`
+静态部署使用 `npm run build_static`
