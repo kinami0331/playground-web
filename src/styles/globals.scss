@@ -1,0 +1,64 @@
+:root {
+  --max-width: 800px;
+  --border-radius: 12px;
+  --font-mono: ui-monospace, Menlo, Monaco, 'Cascadia Mono', 'Segoe UI Mono',
+  'Roboto Mono', 'Oxygen Mono', 'Ubuntu Monospace', 'Source Code Pro',
+  'Fira Mono', 'Droid Sans Mono', 'Courier New', monospace;
+
+  --foreground-rgb: rgb(0, 0, 0);
+  --background-rgb: rgb(255, 255, 255);
+  --card-background-rgb: rgb(255, 255, 255);
+
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: var(--max-width);
+  margin: auto;
+  /*overflow-x: hidden;*/
+}
+
+body {
+  color: var(--foreground-rgb);
+  background: var(--background-rgb);
+}
+
+a {
+  /*color: inherit;*/
+  text-decoration: none;
+}
+
+
+#global-wrapper {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+#content-wrapper {
+  margin-top: 40px;
+}
+
+.fancy-card {
+  background-color: var(--card-background-rgb);
+}
+
+.fill-none-icon {
+  svg {
+    fill: none;
+  }
+}
