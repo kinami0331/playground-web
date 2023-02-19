@@ -16,14 +16,10 @@ export default function Home() {
             </Head>
 
             <main className={styles.main}>
-                <TitleHeader
-                    title="妙妙屋"
-                    icon={<SettingIcon/>}
-                />
+                <TitleHeader title="妙妙屋" icon={<SettingIcon/>}/>
 
-                <IndexCard url="lucky" title="抽卡概率计算"
-                           paragraph="看看我有多非"
-                />
+                <IndexCard url="lucky" title="抽卡概率计算器" paragraph="看看我有多非"/>
+                
                 <br/>
 
             </main>

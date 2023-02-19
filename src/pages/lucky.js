@@ -3,9 +3,9 @@ import styles from "@/styles/Home.module.scss";
 import {TitleHeader} from "@/components/TitleHeader";
 import {useRouter} from "next/router";
 import {LeftCircleIcon} from "@/components/SvgIcons";
-import {Button, Form, InputNumber, Switch} from "antd";
+import {Form, InputNumber, Switch} from "antd";
 import {ContentWrapper} from "@/components/ContentWrapper";
-import {useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import dynamic from "next/dynamic";
 
 const Line = dynamic(() => import("@ant-design/plots").then((mod) => mod.Line), {ssr: false});
@@ -20,10 +20,16 @@ export default function Lucky() {
 
     const router = useRouter();
 
-    const calcList = (p, maxNum) => {
+    const initialValues = useMemo(() => ({
+        p: 0.5,
+        pGot: 1838,
+        maxNum: 100
+    }), []);
+
+    const calcList = (values) => {
+        let p = values.p;
+        let maxNum = values.maxNum;
         let t_p = p / 100;
-        console.log(t_p);
-        console.log(maxNum);
 
         if (Math.abs(t_p - curP) < 1e-8) {
             let t_not_list = notList;
@@ -48,6 +54,18 @@ export default function Lucky() {
         }
     };
 
+    useEffect(() => {
+        let t_p = initialValues.p / 100;
+        setCurP(t_p);
+        let t_not_list = [1];
+        for (let i = 1; i <= initialValues.maxNum; i++) {
+            t_not_list.push(t_not_list[t_not_list.length - 1] * (1 - t_p));
+        }
+        setNotList(t_not_list);
+        setCurCount(initialValues.maxNum);
+
+    }, [initialValues]);
+
     return (<>
         <Head>
             <title>抽卡概率计算器</title>
@@ -68,11 +86,7 @@ export default function Lucky() {
             <ContentWrapper>
                 <Form name="setting" autoComplete="off"
                       form={form}
-                      initialValues={{
-                          p: 0.5,
-                          pGot: 1838,
-                          maxNum: 100
-                      }}
+                      initialValues={initialValues}
                       style={{width: "100%"}}
                       wrapperCol={{
                           span: 12
@@ -84,7 +98,7 @@ export default function Lucky() {
                           // console.log(changedValues);
                           if (values.maxNum !== undefined) {
                               if (values.maxNum === null)
-                                  values.maxNum = 100;
+                                  values.maxNum = 1;
                               else if (values.maxNum < 1)
                                   values.maxNum = 1;
                               else if (values.maxNum > 10000)
@@ -93,7 +107,7 @@ export default function Lucky() {
                           }
                           if (values.p !== undefined) {
                               if (values.p === null)
-                                  values.p = 0.1;
+                                  values.p = 0;
                               else if (values.p < 0)
                                   values.p = 0;
                               else if (values.p > 100)
@@ -102,9 +116,10 @@ export default function Lucky() {
                           }
                           form.setFieldsValue(values);
                           setUseNot(values.useNot);
+                          calcList(values);
                       }}
                       onFinish={(values) => {
-                          calcList(values.p, values.maxNum);
+                          calcList(values);
                       }}
                 >
                     <Form.Item label="单次概率" name="p" rules={[
@@ -127,12 +142,6 @@ export default function Lucky() {
                     <Form.Item label="抽不到的概率" name="useNot" valuePropName="checked">
                         <Switch/>
                     </Form.Item>
-                    <Form.Item>
-                        <Button size="middle" htmlType="submit">
-                            计算！
-                        </Button>
-                    </Form.Item>
-
                 </Form>
                 <br/>
 
