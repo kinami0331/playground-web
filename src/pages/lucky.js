@@ -199,7 +199,7 @@ function ProbabilityPlot({notList, useNot}) {
     };
     return (
         <>
-            <h3 style={{marginBottom: "12px", fontWeight: "400"}}>
+            <h3 style={{marginBottom: "12px", fontWeight: "400", textAlign: "center"}}>
                 {useNot ? "抽不到的概率" : "能抽到的概率"}
             </h3>
             <Line {...config} style={{width: "100%"}}/>
