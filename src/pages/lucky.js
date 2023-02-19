@@ -123,11 +123,10 @@ export default function Lucky() {
                     </Form.Item>
 
                 </Form>
+                <br/>
+
+                <ProbabilityPlot notList={notList} useNot={useNot}/>
             </ContentWrapper>
-            <br/>
-
-            <ProbabilityPlot notList={notList} useNot={useNot}/>
-
         </main>
     </>);
 }
