@@ -1,12 +1,12 @@
 {
-  "name": "admin-panel",
+  "name": "toolbox-web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "build_static": "next build && next export",
-    "start": "next start",
+    "start": "next start -p 5021",
     "lint": "next lint"
   },
   "dependencies": {
