@@ -70,11 +70,15 @@ export default function Lucky() {
                       form={form}
                       initialValues={{
                           p: 0.5,
+                          pGot: 1838,
                           maxNum: 100
                       }}
                       style={{width: "100%"}}
                       wrapperCol={{
                           span: 12
+                      }}
+                      labelCol={{
+                          span: 3
                       }}
                       onValuesChange={(_, values) => {
                           // console.log(changedValues);
@@ -94,6 +98,7 @@ export default function Lucky() {
                                   values.p = 0;
                               else if (values.p > 100)
                                   values.p = 100;
+                              values.pGot = Math.abs(Math.ceil(Math.log(0.0001) / Math.log((1 - values.p / 100))));
                           }
                           form.setFieldsValue(values);
                           setUseNot(values.useNot);
@@ -108,12 +113,18 @@ export default function Lucky() {
                     ]}>
                         <InputNumber step={0.5} addonAfter="%" style={{width: "100%"}}/>
                     </Form.Item>
-                    <Form.Item label="最大次数" name="maxNum" rules={[
+
+                    <Form.Item label="出货所需次数" name="pGot"
+                               extra={"计算的是出货率 99.99% 的次数"}>
+                        <InputNumber disabled={true} style={{width: "100%"}}/>
+                    </Form.Item>
+
+                    <Form.Item label="最大绘图次数" name="maxNum" rules={[
                         {min: 1, type: "integer", message: "最大次数应当是一个正整数"}
                     ]}>
                         <InputNumber step={10} style={{width: "100%"}}/>
                     </Form.Item>
-                    <Form.Item label="显示抽不到的概率" name="useNot" valuePropName="checked">
+                    <Form.Item label="抽不到的概率" name="useNot" valuePropName="checked">
                         <Switch/>
                     </Form.Item>
                     <Form.Item>
